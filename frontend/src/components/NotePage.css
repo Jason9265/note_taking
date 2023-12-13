@@ -1,0 +1,29 @@
+/* src/components/NotePage.css */
+
+.content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.left-content,
+.right-content {
+    width: 45%; /* Adjust the width as needed */
+}
+
+
+.list-group-item {
+    border-bottom: 1px solid #ccc; /* 列表项之间的分隔线 */
+    padding: 10px 15px; /* 内边距，根据需要调整 */
+    background-color: #fff; /* 背景颜色设置为白色 */
+    border-radius: 0; 
+}
+
+.list-group-item:first-child {
+    border-top-left-radius: 5px; /* 第一个列表项的左上圆角 */
+    border-top-right-radius: 5px; /* 第一个列表项的右上圆角 */
+}
+
+.list-group-item:last-child {
+    border-bottom-left-radius: 5px; /* 最后一个列表项的左下圆角 */
+    border-bottom-right-radius: 5px; /* 最后一个列表项的右下圆角 */
+}

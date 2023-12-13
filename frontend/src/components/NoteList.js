@@ -2,18 +2,16 @@
 
 import React from 'react';
 
-const NoteList = ({ onSelectNote }) => {
-    // Fetch or provide a list of notes
-    const notes = [
-        { id: 1, title: 'Note 1', content: 'This is the content of Note 1.' },
-        { id: 2, title: 'Note 2', content: 'Content for Note 2 goes here.' },
-        { id: 3, title: 'Note 3', content: 'Content of Note 3 is included.' },
-    ];
+const NoteList = ({ notes, onSelectNote, activeNoteId }) => {
 
     return (
-        <ul>
+        <ul className="list-group">
             {notes.map((note) => (
-                <li key={note.id} onClick={() => onSelectNote(note)}>
+                <li 
+                    key={note.id}
+                    className={`list-group-item ${note.id === activeNoteId ? 'active' : ''}`}
+                    onClick={() => onSelectNote(note)}
+                >
                     {note.title}
                 </li>
             ))}
