@@ -1,20 +1,25 @@
 // src/components/NotePage.js
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NoteList from './NoteList';
 import NoteContent from './NoteContent';
 import logo from '../img/logoreact.png';
 import './NotePage.css';
 
 const NotePage = () => {
+  const [notes, setNotes] = useState([]);
   const [activeNoteId, setActiveNoteId] = useState(null);
 
-  // Fetch or provide a list of notes
-  const notes = [
-    { id: 1, title: 'Note 1', content: 'This is the content of Note 1.' },
-    { id: 2, title: 'Note 2', content: 'Content for Note 2 goes here.' },
-    { id: 3, title: 'Note 3', content: 'Content of Note 3 is included.' },
-  ];
+  // Fetch list of notes
+  useEffect(() => {
+    const fetchNotes = async () => {
+      const response = await fetch('http://localhost:8000/api/notes/');
+      const data = await response.json();
+      setNotes(data);
+    };
+
+    fetchNotes();
+  }, []);
 
   const handleSelectNote = (note) => {
     setActiveNoteId(note.id);
