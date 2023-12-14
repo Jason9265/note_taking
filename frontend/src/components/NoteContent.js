@@ -10,6 +10,24 @@ const NoteContent = ({ notes, setNotes, activeNoteId }) => {
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [showTagsDropdown, setShowTagsDropdown] = useState(false);
+
+  const toggleTagsDropdown = () => {
+    setShowTagsDropdown(!showTagsDropdown);
+  };
+
+  const isTagSelected = (tagName) => {
+    return selectedTags.includes(tagName);
+  };
+
+  const handleTagChange = (tag, isChecked) => {
+    if (isChecked) {
+      setSelectedTags([...selectedTags, tag]); // Add tag to selected tags
+    } else {
+      setSelectedTags(selectedTags.filter(t => t !== tag)); // Remove tag from selected tags
+    }
+    // Here you would also make an API call to update the tags in the backend if needed
+  };
 
   useEffect(() => {
     // Find the active note by ID
@@ -89,6 +107,7 @@ const NoteContent = ({ notes, setNotes, activeNoteId }) => {
     const selectedOptions = Array.from(e.target.options)
                                   .filter(option => option.selected)
                                   .map(option => option.value);
+    setSelectedTags(selectedOptions);
   };
 
   if (!activeNoteId) {
@@ -104,18 +123,41 @@ const NoteContent = ({ notes, setNotes, activeNoteId }) => {
           className="form-control"
           style={{ width: '60%' }}  // Adjust the width as needed
         />
-        <select 
-          multiple
-          className="form-control" 
-          style={{ marginLeft: '10px', height: '100px' }} // Adjust the height as needed
-          value={selectedTags}
-          onChange={handleTagSelection}
-        >
-          {tags.map(tag => (
-            <option key={tag.id} value={tag.name}>{tag.name}</option>
-          ))}
-          {/* The add new tag functionality needs to be implemented separately */}
-        </select>
+
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          {/* Tags dropdown trigger button */}
+          <button onClick={toggleTagsDropdown} className="btn btn-secondary">
+            Tags
+          </button>
+
+          {/* Tags dropdown list */}
+          {showTagsDropdown && (
+            <div className="dropdown-menu" style={{ 
+              display: 'block', 
+              position: 'absolute', 
+              left: 0, 
+              top: '100%', // Position the dropdown right below the button
+              zIndex: 1000 // Ensure the dropdown is on top of other elements
+            }}>
+              {tags.map(tag => (
+                <div key={tag.id} className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    value={tag.name}
+                    id={`tag-${tag.id}`}
+                    checked={isTagSelected(tag.name)}
+                    onChange={(e) => handleTagChange(tag.name, e.target.checked)}
+                  />
+                  <label className="form-check-label" htmlFor={`tag-${tag.id}`}>
+                    {tag.name}
+                  </label>
+                </div>
+              ))}
+              {/* Add new tag button or input field goes here */}
+            </div>
+          )}
+        </div>
       </div>
       <SimpleMDE
         value={content}
