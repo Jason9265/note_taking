@@ -41,6 +41,35 @@ const NotePage = () => {
     // Implement export .md file functionality
   };
 
+  const handleAddNote = async () => {
+    // Define the new note data
+    const newNoteData = {
+      title: 'New Note',
+      content: 'New Note Content',
+    };
+  
+    // Make a POST request to the server to create a new note
+    const response = await fetch('http://localhost:8000/api/notes/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newNoteData)
+    });
+  
+    // Parse the response to get the created note
+    const createdNote = await response.json();
+  
+    // If the note is created successfully, update the notes state
+    if (response.ok) {
+      setNotes([...notes, createdNote]);
+      setActiveNoteId(createdNote.id); // Optionally set the new note as active
+    } else {
+      // Handle any errors, such as showing a message to the user
+      console.error('Failed to create a new note:', createdNote);
+    }
+  };
+
   return (
     <div>
       <header>
@@ -50,6 +79,7 @@ const NotePage = () => {
         {/* Buttons */}
         <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleChatButtonClick}>Chat with Note</button>
         <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleImportUrlButtonClick}>Import from URL</button>
+        <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleAddNote}>Create New Note</button>
         <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleImportMdButtonClick}>Import .md file</button>
         <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleExportMdButtonClick}>Export .md file</button>
       </header>
