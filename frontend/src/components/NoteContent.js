@@ -1,11 +1,11 @@
 // src/components/NoteContent.js
 
 import React, { useState, useEffect } from 'react';
-import ReactMarkdown from "react-markdown";
+// import ReactMarkdown from "react-markdown";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 
-const NoteContent = ({ notes, activeNoteId }) => {
+const NoteContent = ({ notes, setNotes, activeNoteId }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
@@ -34,7 +34,14 @@ const NoteContent = ({ notes, activeNoteId }) => {
       body: JSON.stringify(noteToUpdate)
     });
 
-    if (!response.ok) {
+    if (response.ok) {
+      setNotes(notes.map(note => {
+        if (note.id === activeNoteId) {
+          return { ...note, title: newTitle };
+        }
+        return note;
+      }));
+    } else {
       console.error('Failed to update the title');
     }
   };
@@ -52,7 +59,14 @@ const NoteContent = ({ notes, activeNoteId }) => {
       body: JSON.stringify(noteToUpdate)
     });
 
-    if (!response.ok) {
+    if (response.ok) {
+      setNotes(notes.map(note => {
+        if (note.id === activeNoteId) {
+          return { ...note, content: newContent };
+        }
+        return note;
+      }));
+    } else {
       console.error('Failed to update the content');
     }
   };

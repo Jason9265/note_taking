@@ -98,6 +98,7 @@ const NotePage = () => {
           <NoteContent 
             notes={notes}
             // onSelectNote={handleSelectNote}
+            setNotes={setNotes}
             activeNoteId={activeNoteId} />
         </div>
       </div>
