@@ -77,11 +77,11 @@ const NotePage = () => {
         <img src={logo} alt="Logo" />
 
         {/* Buttons */}
-        <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleChatButtonClick}>Chat with Note</button>
-        <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleImportUrlButtonClick}>Import from URL</button>
+        <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleChatButtonClick}>Chat with Note</button>
+        <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleImportUrlButtonClick}>Import from URL</button>
         <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleAddNote}>Create New Note</button>
-        <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleImportMdButtonClick}>Import .md file</button>
-        <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleExportMdButtonClick}>Export .md file</button>
+        <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleImportMdButtonClick}>Import .md file</button>
+        <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleExportMdButtonClick}>Export .md file</button>
       </header>
 
       <div className="content">
@@ -97,7 +97,7 @@ const NotePage = () => {
         <div className="note-content col-md-8">
           <NoteContent 
             notes={notes}
-            onSelectNote={handleSelectNote}
+            // onSelectNote={handleSelectNote}
             activeNoteId={activeNoteId} />
         </div>
       </div>
