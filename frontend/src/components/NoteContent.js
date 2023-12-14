@@ -8,6 +8,8 @@ import "easymde/dist/easymde.min.css";
 const NoteContent = ({ notes, setNotes, activeNoteId }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
 
   useEffect(() => {
     // Find the active note by ID
@@ -15,10 +17,22 @@ const NoteContent = ({ notes, setNotes, activeNoteId }) => {
     if (activeNote) {
       setTitle(activeNote.title);
       setContent(activeNote.content);
+      setSelectedTags(activeNote.tags.map(tag => tag.name));
     } else {
       setTitle("");
       setContent("");
+      setSelectedTags([]);
     }
+    // Fetch tags from the backend
+    const fetchTags = async () => {
+      const response = await fetch('http://localhost:8000/api/tags/'); // Adjust the URL to your API
+      if (response.ok) {
+        const data = await response.json();
+        setTags(data);
+      }
+    };
+
+    fetchTags();
   }, [activeNoteId, notes]);
 
   const handleTitleChange = async (newTitle) => {
@@ -71,22 +85,43 @@ const NoteContent = ({ notes, setNotes, activeNoteId }) => {
     }
   };
 
+  const handleTagSelection = (e) => {
+    const selectedOptions = Array.from(e.target.options)
+                                  .filter(option => option.selected)
+                                  .map(option => option.value);
+  };
+
   if (!activeNoteId) {
     return <p>Select a note to view its content</p>;
   }
   return (
     <div>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => handleTitleChange(e.target.value)}
-        className="form-control"
-      />
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => handleTitleChange(e.target.value)}
+          className="form-control"
+          style={{ width: '60%' }}  // Adjust the width as needed
+        />
+        <select 
+          multiple
+          className="form-control" 
+          style={{ marginLeft: '10px', height: '100px' }} // Adjust the height as needed
+          value={selectedTags}
+          onChange={handleTagSelection}
+        >
+          {tags.map(tag => (
+            <option key={tag.id} value={tag.name}>{tag.name}</option>
+          ))}
+          {/* The add new tag functionality needs to be implemented separately */}
+        </select>
+      </div>
       <SimpleMDE
         value={content}
         onChange={handleContentChange}
       />
-      {/* <ReactMarkdown>{content}</ReactMarkdown> */}
+      {/* ... rest of your component ... */}
     </div>
   );
 };

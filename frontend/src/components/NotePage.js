@@ -41,6 +41,10 @@ const NotePage = () => {
     // Implement export .md file functionality
   };
 
+  const handleManageTagsClick = () => {
+    // Implement export .md file functionality
+  };
+
   const handleAddNote = async () => {
     // Define the new note data
     const newNoteData = {
@@ -82,6 +86,7 @@ const NotePage = () => {
         <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleAddNote}>Create New Note</button>
         <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleImportMdButtonClick}>Import .md file</button>
         <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleExportMdButtonClick}>Export .md file</button>
+        <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleManageTagsClick}>Manage tags</button>
       </header>
 
       <div className="content">
