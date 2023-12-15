@@ -9,6 +9,9 @@ import './NotePage.css';
 const NotePage = () => {
   const [notes, setNotes] = useState([]);
   const [activeNoteId, setActiveNoteId] = useState(null);
+  const [showTagsDropdown, setShowTagsDropdown] = useState(false);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [tags, setTags] = useState([]);
 
   // Fetch list of notes
   useEffect(() => {
@@ -19,10 +22,26 @@ const NotePage = () => {
     };
 
     fetchNotes();
+
+    const fetchTags = async () => {
+      const response = await fetch('http://localhost:8000/api/tags/');
+      if (response.ok) {
+        const data = await response.json();
+        setTags(data); // Store all tags in state
+      }
+    };
+
+    fetchTags();
   }, []);
 
   const handleSelectNote = (note) => {
     setActiveNoteId(note.id);
+    setShowTagsDropdown(false);
+    const noteTags = note.tags.map(tagId => 
+      tags.find(tag => tag.id === tagId)?.name || ''
+    ).filter(tagName => tagName); // Remove any undefined or empty strings
+
+    setSelectedTags(noteTags);
   }
 
   const handleChatButtonClick = () => {
@@ -104,7 +123,13 @@ const NotePage = () => {
             notes={notes}
             // onSelectNote={handleSelectNote}
             setNotes={setNotes}
-            activeNoteId={activeNoteId} />
+            activeNoteId={activeNoteId}
+            showTagsDropdown={showTagsDropdown}
+            setShowTagsDropdown={setShowTagsDropdown}
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+            tags={tags}
+            setTags={setTags} />
         </div>
       </div>
     </div>

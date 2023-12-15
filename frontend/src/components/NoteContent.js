@@ -5,12 +5,9 @@ import React, { useState, useEffect } from 'react';
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 
-const NoteContent = ({ notes, setNotes, activeNoteId }) => {
+const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowTagsDropdown, selectedTags, setSelectedTags, tags, setTags }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [tags, setTags] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [showTagsDropdown, setShowTagsDropdown] = useState(false);
 
   const toggleTagsDropdown = () => {
     setShowTagsDropdown(!showTagsDropdown);
@@ -20,13 +17,16 @@ const NoteContent = ({ notes, setNotes, activeNoteId }) => {
     return selectedTags.includes(tagName);
   };
 
-  const handleTagChange = (tag, isChecked) => {
-    if (isChecked) {
-      setSelectedTags([...selectedTags, tag]); // Add tag to selected tags
-    } else {
-      setSelectedTags(selectedTags.filter(t => t !== tag)); // Remove tag from selected tags
-    }
-    // Here you would also make an API call to update the tags in the backend if needed
+  const handleTagChange = (tagId, isChecked) => {
+    setSelectedTags(prevSelectedTags => {
+      if (isChecked) {
+        const tagName = tags.find(tag => tag.id === tagId)?.name || '';
+        return [...prevSelectedTags, tagName].filter(tagName => tagName); // Add tag name and remove any undefined or empty strings
+      } else {
+        const tagName = tags.find(tag => tag.id === tagId)?.name || '';
+        return prevSelectedTags.filter(name => name !== tagName); // Remove tag name
+      }
+    });
   };
 
   useEffect(() => {
@@ -35,22 +35,10 @@ const NoteContent = ({ notes, setNotes, activeNoteId }) => {
     if (activeNote) {
       setTitle(activeNote.title);
       setContent(activeNote.content);
-      setSelectedTags(activeNote.tags.map(tag => tag.name));
     } else {
       setTitle("");
       setContent("");
-      setSelectedTags([]);
     }
-    // Fetch tags from the backend
-    const fetchTags = async () => {
-      const response = await fetch('http://localhost:8000/api/tags/'); // Adjust the URL to your API
-      if (response.ok) {
-        const data = await response.json();
-        setTags(data);
-      }
-    };
-
-    fetchTags();
   }, [activeNoteId, notes]);
 
   const handleTitleChange = async (newTitle) => {
@@ -101,13 +89,6 @@ const NoteContent = ({ notes, setNotes, activeNoteId }) => {
     } else {
       console.error('Failed to update the content');
     }
-  };
-
-  const handleTagSelection = (e) => {
-    const selectedOptions = Array.from(e.target.options)
-                                  .filter(option => option.selected)
-                                  .map(option => option.value);
-    setSelectedTags(selectedOptions);
   };
 
   if (!activeNoteId) {
