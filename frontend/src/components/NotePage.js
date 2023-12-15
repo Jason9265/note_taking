@@ -41,7 +41,7 @@ const NotePage = () => {
       tags.find(tag => tag.id === tagId)?.name || ''
     ).filter(tagName => tagName); // Remove any undefined or empty strings
 
-    setSelectedTags(noteTags);
+    setSelectedTags(note.tags);
   }
 
   const handleChatButtonClick = () => {

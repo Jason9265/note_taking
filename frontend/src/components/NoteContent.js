@@ -13,18 +13,14 @@ const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowT
     setShowTagsDropdown(!showTagsDropdown);
   };
 
-  const isTagSelected = (tagName) => {
-    return selectedTags.includes(tagName);
-  };
-
   const handleTagChange = (tagId, isChecked) => {
     setSelectedTags(prevSelectedTags => {
       if (isChecked) {
         const tagName = tags.find(tag => tag.id === tagId)?.name || '';
-        return [...prevSelectedTags, tagName].filter(tagName => tagName); // Add tag name and remove any undefined or empty strings
+        return [...prevSelectedTags, tagId];
       } else {
         const tagName = tags.find(tag => tag.id === tagId)?.name || '';
-        return prevSelectedTags.filter(name => name !== tagName); // Remove tag name
+        return prevSelectedTags.filter(id => id !== tagId);
       }
     });
   };
@@ -125,10 +121,10 @@ const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowT
                   <input
                     className="form-check-input"
                     type="checkbox"
-                    value={tag.name}
+                    value={tag.id}
                     id={`tag-${tag.id}`}
-                    checked={isTagSelected(tag.name)}
-                    onChange={(e) => handleTagChange(tag.name, e.target.checked)}
+                    checked={selectedTags.includes(tag.id)} // Check if the tag's ID is in the selectedTags array
+                    onChange={(e) => handleTagChange(tag.id, e.target.checked)}
                   />
                   <label className="form-check-label" htmlFor={`tag-${tag.id}`}>
                     {tag.name}
