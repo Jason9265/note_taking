@@ -37,10 +37,6 @@ const NotePage = () => {
   const handleSelectNote = (note) => {
     setActiveNoteId(note.id);
     setShowTagsDropdown(false);
-    const noteTags = note.tags.map(tagId => 
-      tags.find(tag => tag.id === tagId)?.name || ''
-    ).filter(tagName => tagName); // Remove any undefined or empty strings
-
     setSelectedTags(note.tags);
   }
 

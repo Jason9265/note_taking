@@ -13,18 +13,6 @@ const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowT
     setShowTagsDropdown(!showTagsDropdown);
   };
 
-  const handleTagChange = (tagId, isChecked) => {
-    setSelectedTags(prevSelectedTags => {
-      if (isChecked) {
-        const tagName = tags.find(tag => tag.id === tagId)?.name || '';
-        return [...prevSelectedTags, tagId];
-      } else {
-        const tagName = tags.find(tag => tag.id === tagId)?.name || '';
-        return prevSelectedTags.filter(id => id !== tagId);
-      }
-    });
-  };
-
   useEffect(() => {
     // Find the active note by ID
     const activeNote = notes.find(note => note.id === activeNoteId);
@@ -87,6 +75,32 @@ const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowT
     }
   };
 
+  const handleTagChange = async (tagId, isChecked) => {
+    const newSelectedTags = isChecked
+      ? [...selectedTags, tagId]
+      : selectedTags.filter(id => id !== tagId);
+
+      setSelectedTags(newSelectedTags);
+      const noteToUpdate = {
+      tags: newSelectedTags
+    };
+
+    const response = await fetch(`http://localhost:8000/api/notes/${activeNoteId}/`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(noteToUpdate)
+    });
+
+    if (!response.ok) {
+      console.error('Failed to update the tags');
+      console.log(response);
+    }
+
+    return newSelectedTags;
+  };
+  
   if (!activeNoteId) {
     return <p>Select a note to view its content</p>;
   }
