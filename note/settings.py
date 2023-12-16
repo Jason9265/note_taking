@@ -139,3 +139,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
+
+# set openai_key
+from decouple import config
+OPENAI_KEY = config('openai_api_key')
+# can use it by
+# from django.conf import settings
+# openai_key = settings.OPENAI_KEY

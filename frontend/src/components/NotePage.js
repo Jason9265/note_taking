@@ -1,12 +1,14 @@
 // src/components/NotePage.js
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NoteList from './NoteList';
 import NoteContent from './NoteContent';
 import logo from '../img/logoreact.png';
 import './NotePage.css';
 
 const NotePage = () => {
+  const navigate = useNavigate();
   const [notes, setNotes] = useState([]);
   const [activeNoteId, setActiveNoteId] = useState(null);
   const [showTagsDropdown, setShowTagsDropdown] = useState(false);
@@ -41,7 +43,7 @@ const NotePage = () => {
   }
 
   const handleChatButtonClick = () => {
-    // Implement chat functionality
+    navigate('/chatnote');
   };
 
   const handleImportUrlButtonClick = () => {
@@ -96,7 +98,7 @@ const NotePage = () => {
         <img src={logo} alt="Logo" />
 
         {/* Buttons */}
-        <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleChatButtonClick}>Chat with Note</button>
+        <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleChatButtonClick}>Chat with Note</button>
         <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleImportUrlButtonClick}>Import from URL</button>
         <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleAddNote}>Create New Note</button>
         <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleImportMdButtonClick}>Import .md file</button>
