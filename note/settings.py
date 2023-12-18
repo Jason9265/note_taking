@@ -142,7 +142,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 # set openai_key
 from decouple import config
-OPENAI_KEY = config('openai_api_key')
+OPENAI_KEY = config('OPENAI_API_KEY')
 # can use it by
 # from django.conf import settings
 # openai_key = settings.OPENAI_KEY
