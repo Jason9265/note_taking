@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'webpack_loader',
     'rest_framework',
     'note_taking',
+    'my_openai_api',
 ]
 
 WEBPACK_LOADER = {
@@ -141,8 +142,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 # set openai_key
-from decouple import config
-OPENAI_KEY = config('OPENAI_API_KEY')
+# from decouple import config
+# OPENAI_KEY = config('OPENAI_API_KEY')
 # can use it by
 # from django.conf import settings
 # openai_key = settings.OPENAI_KEY

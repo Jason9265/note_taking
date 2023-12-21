@@ -19,5 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('note_taking.urls')),  # Adjust the path as needed for your API endpoint structure
+    path('api/', include('note_taking.urls')),
+    path('api/', include('my_openai_api.urls')),
 ]

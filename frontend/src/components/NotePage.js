@@ -94,10 +94,10 @@ const NotePage = () => {
   return (
     <div>
       <header>
-        {/* Your logo */}
-        <img src={logo} alt="Logo" />
+        <a href="/note">
+          <img src={logo} alt="Logo" height="80" />
+        </a>
 
-        {/* Buttons */}
         <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleChatButtonClick}>Chat with Note</button>
         <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleImportUrlButtonClick}>Import from URL</button>
         <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleAddNote}>Create New Note</button>
