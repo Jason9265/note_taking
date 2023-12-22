@@ -6,6 +6,7 @@ import NoteList from './NoteList';
 import NoteContent from './NoteContent';
 import logo from '../img/logoreact.png';
 import './NotePage.css';
+import { Button, Container, Row, Col } from 'react-bootstrap';
 
 const NotePage = () => {
   const navigate = useNavigate();
@@ -92,45 +93,47 @@ const NotePage = () => {
   };
 
   return (
-    <div>
-      <header>
-        <a href="/note">
-          <img src={logo} alt="Logo" height="80" />
-        </a>
+    <Container fluid>
+      <Row className="align-items-center">
+        <Col xs={12} className="mb-3">
+          <header className="d-flex align-items-center">
+            <a href="/note">
+              <img src={logo} alt="Logo" height="80" />
+            </a>
 
-        <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleChatButtonClick}>Chat with Note</button>
-        <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleImportUrlButtonClick}>Import from URL</button>
-        <button type="button" className="btn btn-outline-primary btn-lg" onClick={handleAddNote}>Create New Note</button>
-        <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleImportMdButtonClick}>Import .md file</button>
-        <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleExportMdButtonClick}>Export .md file</button>
-        <button type="button" disabled className="btn btn-outline-primary btn-lg" onClick={handleManageTagsClick}>Manage tags</button>
-      </header>
+            <Button variant="outline-primary btn-lg ms-2" onClick={handleChatButtonClick}>Chat with Note</Button>
+            <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleImportUrlButtonClick}>Import from URL</Button>
+            <Button variant="outline-primary btn-lg ms-2" onClick={handleAddNote}>Create New Note</Button>
+            <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleImportMdButtonClick}>Import .md file</Button>
+            <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleExportMdButtonClick}>Export .md file</Button>
+            <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleManageTagsClick}>Manage tags</Button>
+          </header>
+        </Col>
+      </Row>
 
-      <div className="content">
+      <Row>
         {/* Left side: Note list */}
-        <div className="note-list col-md-4">
+        <Col md={4}>
           <NoteList 
             notes={notes}
             onSelectNote={handleSelectNote}
             activeNoteId={activeNoteId} />
-        </div>
+        </Col>
 
         {/* Right side: Content of the selected note */}
-        <div className="note-content col-md-8">
+        <Col md={8}>
           <NoteContent 
             notes={notes}
-            // onSelectNote={handleSelectNote}
             setNotes={setNotes}
             activeNoteId={activeNoteId}
             showTagsDropdown={showTagsDropdown}
             setShowTagsDropdown={setShowTagsDropdown}
             selectedTags={selectedTags}
             setSelectedTags={setSelectedTags}
-            tags={tags}
-            setTags={setTags} />
-        </div>
-      </div>
-    </div>
+            tags={tags} />
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

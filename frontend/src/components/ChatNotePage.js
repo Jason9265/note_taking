@@ -1,12 +1,11 @@
 import logo from '../img/logoreact.png';
 import React, { useState, useEffect } from 'react';
-import { Dropdown, InputGroup, FormControl } from 'react-bootstrap';
+import { Button, InputGroup, FormControl, Form } from 'react-bootstrap';
 import './NotePage.css';
 
 
 const ChatWithNote = () => {
-  const [selectedItem, setSelectedItem] = useState('');
-  const [selectedTag, setSelectedTag] = useState('');
+  const [selectedTag, setSelectedTag] = useState('All');
   const [message, setMessage] = useState('');
   const [instructions, setInstructions] = useState('');
   const [tags, setTags] = useState([]);
@@ -25,11 +24,12 @@ const ChatWithNote = () => {
   }, []);
 
   const handleGenerateKB = () => {
-    // console.log(selectedItem);
+    // console.log(selectedTag);
   };
 
-  const handleSelect = (eventKey) => {
-    setSelectedItem(eventKey);
+  const handleSelect = (event) => {
+    const value = event.target.value;
+    setSelectedTag(value);
   };
 
   const handleUpdateIntro = () => {
@@ -50,25 +50,20 @@ const ChatWithNote = () => {
         <a href="/note">
           <img src={logo} alt="Logo" height="80" />
         </a>
-        <h1 className='ml-3'>Chat with Your Notes</h1>
+        <h1 className='ml-3 ms-2'>Chat with Your Notes</h1>
       </header>
-      <div>
-        <Dropdown onSelect={handleSelect}>
-          <Dropdown.Toggle variant="success" id="dropdown-basic">
-            Selecte Tag
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu>
-            <Dropdown.Item eventKey="All">All</Dropdown.Item>
-            <div className="dropdown-divider"></div>
-            {tags.map((tag, index) => (
-              <Dropdown.Item key={index} eventKey={tag.id}>
-                {tag.name}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-          <button type="button" className="btn btn-primary ms-2" onClick={handleGenerateKB}>Generate knowledge base</button>
-        </Dropdown>
+      <div className='mt-4'>
+        <div className='col-md-8'>
+          <InputGroup>
+            <Form.Select onChange={handleSelect} className='w-75'>
+              <option key={"All"} value="All">All Tags</option>
+              {tags.map((tag, index) => (
+                <option key={index} value={tag.id}>{tag.name}</option>
+                ))}
+            </Form.Select>
+            <Button variant="primary w-25" onClick={handleGenerateKB}>Generate knowledge base</Button>
+          </InputGroup>
+        </div>
 
         <div className='col-md-8 mt-4'>
           <InputGroup>
@@ -81,7 +76,7 @@ const ChatWithNote = () => {
             />
           </InputGroup>
           <div className="d-flex justify-content-end mt-2">
-            <button type="button" className="btn btn-primary" onClick={handleUpdateIntro}>Provide instructions</button>
+            <Button variant="primary" onClick={handleUpdateIntro}>Provide instructions</Button>
           </div>
         </div>
 
@@ -96,8 +91,8 @@ const ChatWithNote = () => {
             />
           </InputGroup>
             <div className="d-flex justify-content-end mt-2">
-              <button type="button" className="btn btn-primary" onClick={handleSendMessage}>Send</button>
-              <button type="button" className="btn btn-primary ms-2" onClick={handleSaveChat}>Save as Note</button>
+              <Button variant="primary" onClick={handleSendMessage}>Send</Button>
+              <Button variant="primary ms-2" onClick={handleSaveChat}>Save as Note</Button>
             </div>
           </div>
         </div>

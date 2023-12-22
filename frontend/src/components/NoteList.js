@@ -1,21 +1,23 @@
 // src/components/NoteList.js
 
 import React from 'react';
+import { ListGroup } from 'react-bootstrap';
 
 const NoteList = ({ notes, onSelectNote, activeNoteId }) => {
 
     return (
-        <ul className="list-group">
+        <ListGroup className='mt-4'>
             {notes.map((note) => (
-                <li 
+                <ListGroup.Item
                     key={note.id}
-                    className={`list-group-item ${note.id === activeNoteId ? 'active' : ''}`}
+                    action
+                    active={note.id === activeNoteId}
                     onClick={() => onSelectNote(note)}
                 >
                     {note.title}
-                </li>
+                </ListGroup.Item>
             ))}
-        </ul>
+        </ListGroup>
     );
 };
 
