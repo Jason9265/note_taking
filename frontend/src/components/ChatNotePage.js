@@ -1,6 +1,6 @@
 import logo from '../img/logoreact.png';
 import React, { useState, useEffect } from 'react';
-import { Button, InputGroup, FormControl, Form } from 'react-bootstrap';
+import { Button, InputGroup, FormControl, Form, Container, Row, Col } from 'react-bootstrap';
 import './NotePage.css';
 
 
@@ -45,28 +45,29 @@ const ChatWithNote = () => {
   };
 
   return (
-    <div>
-      <header className="d-flex align-items-center">
-        <a href="/note">
-          <img src={logo} alt="Logo" height="80" />
-        </a>
-        <h1 className='ml-3 ms-2'>Chat with Your Notes</h1>
-      </header>
-      <div className='mt-4'>
-        <div className='col-md-8'>
-          <InputGroup>
-            <Form.Select onChange={handleSelect} className='w-75'>
-              <option key={"All"} value="All">All Tags</option>
-              {tags.map((tag, index) => (
-                <option key={index} value={tag.id}>{tag.name}</option>
-                ))}
-            </Form.Select>
-            <Button variant="primary w-25" onClick={handleGenerateKB}>Generate knowledge base</Button>
-          </InputGroup>
-        </div>
+    <Container fluid>
+      <Row className="align-items-center my-3">
+        <Col xs={12} md={6} className="d-flex align-items-center">
+          <a href="/note">
+            <img src={logo} alt="Logo" height="80" />
+          </a>
+          <h1 className='ms-2'>Chat with Your Notes</h1>
+        </Col>
+      </Row>
 
-        <div className='col-md-8 mt-4'>
-          <InputGroup>
+      <Row>
+        <Col md={8}>
+          <InputGroup className="mb-3">
+            <Form.Select onChange={handleSelect} className='w-75'>
+              <option value="All">All Tags</option>
+              {tags.map(tag => (
+                <option key={tag.id} value={tag.id}>{tag.name}</option>
+              ))}
+            </Form.Select>
+            <Button variant="primary" className="w-25" onClick={handleGenerateKB}>Generate knowledge base</Button>
+          </InputGroup>
+
+          <InputGroup className="mb-3">
             <InputGroup.Text>Chat Instructions...</InputGroup.Text>
             <FormControl
               as="textarea"
@@ -78,10 +79,8 @@ const ChatWithNote = () => {
           <div className="d-flex justify-content-end mt-2">
             <Button variant="primary" onClick={handleUpdateIntro}>Provide instructions</Button>
           </div>
-        </div>
 
-        <div id="chat-box" className='col-md-8 mt-4'>
-          <InputGroup>
+          <InputGroup className="mb-3 mt-3">
             <InputGroup.Text>Chat Box...</InputGroup.Text>
             <FormControl
               as="textarea"
@@ -90,13 +89,17 @@ const ChatWithNote = () => {
               placeholder='Type your message...'
             />
           </InputGroup>
-            <div className="d-flex justify-content-end mt-2">
-              <Button variant="primary" onClick={handleSendMessage}>Send</Button>
-              <Button variant="primary ms-2" onClick={handleSaveChat}>Save as Note</Button>
-            </div>
+          <div className="d-flex justify-content-end mt-2">
+            <Button variant="primary" onClick={handleSendMessage}>Send</Button>
+            <Button variant="primary ms-2" onClick={handleSaveChat}>Save as Note</Button>
           </div>
-        </div>
-    </div>
+        </Col>
+
+        {/* Chat History unfinished */}
+        <Col hidden md={4}>Chat History
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
