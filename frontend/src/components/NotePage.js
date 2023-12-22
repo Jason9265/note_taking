@@ -94,7 +94,7 @@ const NotePage = () => {
 
   return (
     <Container fluid>
-      <Row className="align-items-center">
+      <Row className="align-items-center my-3">
         <Col xs={12} className="mb-3">
           <header className="d-flex align-items-center">
             <a href="/note">

@@ -23,8 +23,28 @@ const ChatWithNote = () => {
     fetchTags();
   }, []);
 
-  const handleGenerateKB = () => {
-    // console.log(selectedTag);
+  const handleGenerateKB = async () => {
+    // Create md file remotely
+    const response = await fetch('http://localhost:8000/api/create_md_remote/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ selectedTag: selectedTag})
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.error) {
+      console.error('Error from backend:', data.error);
+      // Handle error
+    } else {
+      console.log('Success:', data);
+      // Handle success - do something with data.response
+    }
   };
 
   const handleSelect = (event) => {
@@ -33,11 +53,14 @@ const ChatWithNote = () => {
   };
 
   const handleUpdateIntro = () => {
+    // Create Assistance and Thread
 
   }
 
   const handleSendMessage = () => {
-    // Logic to handle sending message
+    // Run command
+
+    // List message
   };
 
   const handleSaveChat = () => {
@@ -61,7 +84,7 @@ const ChatWithNote = () => {
             <Form.Select onChange={handleSelect} className='w-75'>
               <option value="All">All Tags</option>
               {tags.map(tag => (
-                <option key={tag.id} value={tag.id}>{tag.name}</option>
+                <option key={tag.id} value={tag.name}>{tag.name}</option>
               ))}
             </Form.Select>
             <Button variant="primary" className="w-25" onClick={handleGenerateKB}>Generate knowledge base</Button>
