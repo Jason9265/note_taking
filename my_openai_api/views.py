@@ -1,9 +1,10 @@
 import os
+import datetime
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from openai import OpenAI
-from note_taking.models import Note, Tag
+from note_taking.models import Note
 
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 file_path = os.path.join(os.path.dirname(__file__), 'files')
@@ -12,7 +13,8 @@ file_path = os.path.join(os.path.dirname(__file__), 'files')
 @api_view(['POST'])
 def create_md_remote(request):
     selectedTag = request.data.get('selectedTag', '')
-    final_file_path = os.path.join(file_path, 'test.md')
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M")
+    final_file_path = os.path.join(file_path, f'note_{timestamp}.md')
 
     # generate .md file
     if selectedTag == 'All':
@@ -42,8 +44,8 @@ def create_md_remote(request):
 
 @api_view(['POST'])
 def create_assistance_thread(request):
-    instruction = request.data
-    file_id = request.data
+    instruction = request.data.get('instructions')
+    file_id = request.data.get('fileId')
 
     # Call OpenAI API
     try:
@@ -52,65 +54,58 @@ def create_assistance_thread(request):
             instructions=instruction,
             model="gpt-3.5-turbo-1106",
             tools=[{"type": "retrieval"}],
-            file_ids=file_id
+            file_ids=[file_id, file_id]
         )
 
         # create Thread
         thread = client.beta.threads.create()
 
-        return JsonResponse({'response': 'ok'})
+        return JsonResponse({
+            'response': 'ok',
+            'assistant_id': assistant.id,
+            'thread_id': thread.id,
+            'file_id': file_id
+        })
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
 @api_view(['POST'])
 def gpt_message(request):
+    thread_id = request.data.get('threadId')
+    assistant_id = request.data.get('assistantId')
+    instruction = request.data.get('instructions')
+    content = request.data.get('content')
 
     # Call OpenAI API
     try:
         # create Message
         message = client.beta.threads.messages.create(
-            thread_id=thread.id,
+            thread_id=thread_id,
             role="user",
-            content="I need to solve the equation `3x + 11 = 14`. Can you help me?"
+            content=content,
         )
-        return JsonResponse({'response': 'ok'})
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
 
-@api_view(['POST'])
-def gpttest_view(request):
-    try:
-        # assistant = client.beta.assistants.create(
-        #     name="Math Tutor",
-        #     instructions="You are a personal math tutor. Write and run code to answer math questions",
-        #     tools=[{"type": "code_interpreter"}],
-        #     model="gpt-3.5-turbo-1106"
-        # )
+        # run
+        run = client.beta.threads.runs.create(
+            thread_id=thread_id,
+            assistant_id=assistant_id,
+            instructions=instruction
+        )
 
-        # thread = client.beta.threads.create()
-
-        # message = client.beta.threads.messages.create(
-        #     thread_id=thread.id,
-        #     role="user",
-        #     content="I need to solve the equation `3x + 11 = 14`. Can you help me?"
-        # )
-        
-        # # run = client.beta.threads.runs.create(
-        # #     thread_id=thread.id,
-        # #     assistant_id=assistant.id,
-        # #     instructions="Please address the user as Jane Doe."
-        # # )
-        # # run = client.beta.threads.runs.retrieve(
-        # #     thread_id=thread.id,
-        #     #  run_id=run.id
-        # #     )
-        
-        # # messages = client.beta.threads.messages.list(
-        # #     thread_id=thread.id
-        # #     )
-        
-        # print(thread)
-        
-        return JsonResponse({"message": "done"})
+        # view message
+        messages = client.beta.threads.messages.list(
+            thread_id=thread_id
+        )
+        extracted_data = []
+        for thread_message in messages.data:
+            if thread_message.content and len(thread_message.content) > 0 and hasattr(thread_message.content[0], 'text'):
+                value = thread_message.content[0].text.value
+                role = thread_message.role
+                extracted_data.append({'value': value, 'role': role})
+        return JsonResponse({
+            'response': 'ok',
+            'thread_id': thread_id,
+            'messages': extracted_data,
+        })
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)

@@ -4,11 +4,23 @@ import { Button, InputGroup, FormControl, Form, Container, Row, Col } from 'reac
 import './NotePage.css';
 
 
+const Message = ({ message }) => {
+  return (
+    <div className={`message ${message.role}`}>
+      <p>{message.role === 'user' ? 'You: ' : 'Assistant: '}{message.value}</p>
+    </div>
+  );
+};
+
 const ChatWithNote = () => {
   const [selectedTag, setSelectedTag] = useState('All');
-  const [message, setMessage] = useState('');
+  const [content, setContent] = useState('');
   const [instructions, setInstructions] = useState('');
   const [tags, setTags] = useState([]);
+  const [fileId, setFileId] = useState('');
+  const [threadId, setThreadId] = useState('');
+  const [assistantId, setAssistantId] = useState('');
+  const [messages, setMesages] = useState([]);
 
 
   useEffect(() => {
@@ -40,10 +52,9 @@ const ChatWithNote = () => {
     const data = await response.json();
     if (data.error) {
       console.error('Error from backend:', data.error);
-      // Handle error
     } else {
       console.log('Success:', data);
-      // Handle success - do something with data.response
+      setFileId(data.file_id);
     }
   };
 
@@ -52,19 +63,55 @@ const ChatWithNote = () => {
     setSelectedTag(value);
   };
 
-  const handleUpdateIntro = () => {
+  const handleUpdateIntro = async () => {
     // Create Assistance and Thread
-
+    const response = await fetch('http://localhost:8000/api/create_assistance_thread/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fileId: fileId, instructions: instructions})
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    if (data.error) {
+      console.error('Error from backend:', data.error);
+    } else {
+      console.log('Success:', data);
+      setThreadId(data.thread_id);
+      setAssistantId(data.assistant_id);
+    }
   }
 
-  const handleSendMessage = () => {
-    // Run command
+  const handleSendMessage = async () => {
+    // Run command and list messages
+    const response = await fetch('http://localhost:8000/api/gpt_message/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ threadId: threadId, assistantId: assistantId, instructions: instructions, content: content })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    if (data.error) {
+      console.error('Error from backend:', data.error);
+    } else {
+      console.log('Success:', data);
+      await setMesages(data.messages)
+    }
 
-    // List message
   };
 
   const handleSaveChat = () => {
     // Logic to save chat as a note
+    console.log(messages);
   };
 
   return (
@@ -103,12 +150,18 @@ const ChatWithNote = () => {
             <Button variant="primary" onClick={handleUpdateIntro}>Provide instructions</Button>
           </div>
 
+          <div className="message-dialog">
+            {messages.map((value, index) => (
+              <Message key={index} message={value} />
+            ))}
+          </div>
+
           <InputGroup className="mb-3 mt-3">
             <InputGroup.Text>Chat Box...</InputGroup.Text>
             <FormControl
               as="textarea"
-              value={message}
-              onChange={e => setMessage(e.target.value)}
+              value={content}
+              onChange={e => setContent(e.target.value)}
               placeholder='Type your message...'
             />
           </InputGroup>
