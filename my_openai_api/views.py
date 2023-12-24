@@ -1,5 +1,6 @@
 import os
 import datetime
+import time
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
@@ -47,12 +48,11 @@ def create_assistance_thread(request):
     instruction = request.data.get('instructions')
     file_id = request.data.get('fileId')
 
-    # Call OpenAI API
     try:
         # create Assistant
         assistant = client.beta.assistants.create(
             instructions=instruction,
-            model="gpt-3.5-turbo-1106",
+            model="gpt-4-1106-preview",
             tools=[{"type": "retrieval"}],
             file_ids=[file_id, file_id]
         )
@@ -76,7 +76,6 @@ def gpt_message(request):
     instruction = request.data.get('instructions')
     content = request.data.get('content')
 
-    # Call OpenAI API
     try:
         # create Message
         message = client.beta.threads.messages.create(
@@ -92,6 +91,20 @@ def gpt_message(request):
             instructions=instruction
         )
 
+        run_completed = False
+        while not run_completed:
+            # Sleep for a short period to avoid rate limiting
+            time.sleep(5)
+            # Check the status of the run
+            run_status = client.beta.threads.runs.retrieve(
+                thread_id=thread_id,
+                run_id=run.id
+            )
+            if run_status.status == 'completed':
+                run_completed = True
+            elif run_status.status == 'failed':
+                return JsonResponse({'error': 'Run failed'}, status=500)
+        
         # view message
         messages = client.beta.threads.messages.list(
             thread_id=thread_id
@@ -102,9 +115,11 @@ def gpt_message(request):
                 value = thread_message.content[0].text.value
                 role = thread_message.role
                 extracted_data.append({'value': value, 'role': role})
+        result = extracted_data[0].get('value')
         return JsonResponse({
             'response': 'ok',
             'thread_id': thread_id,
+            'result': result,
             'messages': extracted_data,
         })
     except Exception as e:

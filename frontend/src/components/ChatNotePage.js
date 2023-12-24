@@ -1,16 +1,8 @@
 import logo from '../img/logoreact.png';
-import React, { useState, useEffect } from 'react';
-import { Button, InputGroup, FormControl, Form, Container, Row, Col } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Button, InputGroup, FormControl, Form, Container, Row, Col, ListGroup } from 'react-bootstrap';
 import './NotePage.css';
 
-
-const Message = ({ message }) => {
-  return (
-    <div className={`message ${message.role}`}>
-      <p>{message.role === 'user' ? 'You: ' : 'Assistant: '}{message.value}</p>
-    </div>
-  );
-};
 
 const ChatWithNote = () => {
   const [selectedTag, setSelectedTag] = useState('All');
@@ -20,7 +12,8 @@ const ChatWithNote = () => {
   const [fileId, setFileId] = useState('');
   const [threadId, setThreadId] = useState('');
   const [assistantId, setAssistantId] = useState('');
-  const [messages, setMesages] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const messagesEndRef = useRef(null);
 
 
   useEffect(() => {
@@ -28,12 +21,16 @@ const ChatWithNote = () => {
       const response = await fetch('http://localhost:8000/api/tags/');
       if (response.ok) {
         const data = await response.json();
-        setTags(data); // Store all tags in state
+        setTags(data);
       }
     };
 
     fetchTags();
   }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleGenerateKB = async () => {
     // Create md file remotely
@@ -74,7 +71,7 @@ const ChatWithNote = () => {
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}\nError from backend:', ${response.json().error}`);
     }
     const data = await response.json();
     if (data.error) {
@@ -87,31 +84,42 @@ const ChatWithNote = () => {
   }
 
   const handleSendMessage = async () => {
+    const newMessage = { value: content, role: 'You' };
+    setMessages([...messages, newMessage]);
+    setContent('');
+
     // Run command and list messages
     const response = await fetch('http://localhost:8000/api/gpt_message/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ threadId: threadId, assistantId: assistantId, instructions: instructions, content: content })
+      body: JSON.stringify({
+        threadId: threadId, 
+        assistantId: assistantId, 
+        instructions: instructions, 
+        content: content,
+      })
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}\nError from backend:', ${response.json().error}`);
     }
     const data = await response.json();
     if (data.error) {
       console.error('Error from backend:', data.error);
     } else {
       console.log('Success:', data);
-      await setMesages(data.messages)
+      setMessages([...messages, newMessage, { value: data.result, role: 'gpt' }]);
     }
-
   };
 
   const handleSaveChat = () => {
     // Logic to save chat as a note
-    console.log(messages);
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -127,7 +135,7 @@ const ChatWithNote = () => {
 
       <Row>
         <Col md={8}>
-          <InputGroup className="mb-3">
+          <InputGroup className="mb-2">
             <Form.Select onChange={handleSelect} className='w-75'>
               <option value="All">All Tags</option>
               {tags.map(tag => (
@@ -137,7 +145,7 @@ const ChatWithNote = () => {
             <Button variant="primary" className="w-25" onClick={handleGenerateKB}>Generate knowledge base</Button>
           </InputGroup>
 
-          <InputGroup className="mb-3">
+          <InputGroup className="mb-2">
             <InputGroup.Text>Chat Instructions...</InputGroup.Text>
             <FormControl
               as="textarea"
@@ -150,13 +158,16 @@ const ChatWithNote = () => {
             <Button variant="primary" onClick={handleUpdateIntro}>Provide instructions</Button>
           </div>
 
-          <div className="message-dialog">
-            {messages.map((value, index) => (
-              <Message key={index} message={value} />
+          <ListGroup className="mt-2" style={{ height: '250px', overflowY: 'auto' }}>
+            {messages.map((msg, index) => (
+              <ListGroup.Item key={index}>
+                <b>{msg.role}:</b> {msg.value}
+              </ListGroup.Item>
             ))}
-          </div>
+            <div ref={messagesEndRef} />
+          </ListGroup>
 
-          <InputGroup className="mb-3 mt-3">
+          <InputGroup className="mb-2 mt-2">
             <InputGroup.Text>Chat Box...</InputGroup.Text>
             <FormControl
               as="textarea"
@@ -167,7 +178,7 @@ const ChatWithNote = () => {
           </InputGroup>
           <div className="d-flex justify-content-end mt-2">
             <Button variant="primary" onClick={handleSendMessage}>Send</Button>
-            <Button variant="primary ms-2" onClick={handleSaveChat}>Save as Note</Button>
+            <Button disabled variant="primary ms-2" onClick={handleSaveChat}>Save as Note</Button>
           </div>
         </Col>
 
