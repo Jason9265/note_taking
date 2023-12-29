@@ -42,12 +42,7 @@ const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowT
     });
 
     if (response.ok) {
-      setNotes(notes.map(note => {
-        if (note.id === activeNoteId) {
-          return { ...note, title: newTitle };
-        }
-        return note;
-      }));
+      return 'Title updated.';
     } else {
       console.error('Failed to update the title');
     }
@@ -68,12 +63,7 @@ const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowT
     });
 
     if (response.ok) {
-      setNotes(notes.map(note => {
-        if (note.id === activeNoteId) {
-          return { ...note, content: newContent };
-        }
-        return note;
-      }));
+      return 'Content updated.';
     } else {
       console.error('Failed to update the content');
     }

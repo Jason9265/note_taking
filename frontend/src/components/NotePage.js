@@ -16,14 +16,15 @@ const NotePage = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [tags, setTags] = useState([]);
 
+
+  const fetchNotes = async () => {
+    const response = await fetch('http://localhost:8000/api/notes/');
+    const data = await response.json();
+    setNotes(data);
+  };
+
   // Fetch list of notes
   useEffect(() => {
-    const fetchNotes = async () => {
-      const response = await fetch('http://localhost:8000/api/notes/');
-      const data = await response.json();
-      setNotes(data);
-    };
-
     fetchNotes();
 
     const fetchTags = async () => {
@@ -36,8 +37,9 @@ const NotePage = () => {
 
     fetchTags();
   }, []);
-
+ 
   const handleSelectNote = (note) => {
+    fetchNotes();
     setActiveNoteId(note.id);
     setShowTagsDropdown(false);
     setSelectedTags(note.tags);
