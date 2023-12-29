@@ -18,7 +18,7 @@ const ChatWithNote = () => {
 
   useEffect(() => {
     const fetchTags = async () => {
-      const response = await fetch('http://localhost:8000/api/tags/');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tags/`);
       if (response.ok) {
         const data = await response.json();
         setTags(data);
@@ -34,7 +34,7 @@ const ChatWithNote = () => {
 
   const handleGenerateKB = async () => {
     // Create md file remotely
-    const response = await fetch('http://localhost:8000/api/create_md_remote/', {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/create_md_remote/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ const ChatWithNote = () => {
 
   const handleUpdateIntro = async () => {
     // Create Assistance and Thread
-    const response = await fetch('http://localhost:8000/api/create_assistance_thread/', {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/create_assistance_thread/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ const ChatWithNote = () => {
     setContent('');
 
     // Run command and list messages
-    const response = await fetch('http://localhost:8000/api/gpt_message/', {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/gpt_message/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

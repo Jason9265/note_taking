@@ -6,7 +6,7 @@ import "easymde/dist/easymde.min.css";
 import { Container, Form, InputGroup, FormControl, Dropdown } from 'react-bootstrap';
 
 
-const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowTagsDropdown, selectedTags, setSelectedTags, tags }) => {
+const NoteContent = ({ notes, activeNoteId, showTagsDropdown, setShowTagsDropdown, selectedTags, setSelectedTags, tags }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
@@ -33,7 +33,7 @@ const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowT
 
     const noteToUpdate = { ...notes.find(note => note.id === activeNoteId), title: newTitle };
 
-    const response = await fetch(`http://localhost:8000/api/notes/${activeNoteId}/`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/${activeNoteId}/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowT
 
     const noteToUpdate = { ...notes.find(note => note.id === activeNoteId), content: newContent };
 
-    const response = await fetch(`http://localhost:8000/api/notes/${activeNoteId}/`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/${activeNoteId}/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ const NoteContent = ({ notes, setNotes, activeNoteId, showTagsDropdown, setShowT
       tags: newSelectedTags
     };
 
-    const response = await fetch(`http://localhost:8000/api/notes/${activeNoteId}/`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/${activeNoteId}/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

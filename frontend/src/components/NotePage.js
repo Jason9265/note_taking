@@ -18,7 +18,7 @@ const NotePage = () => {
 
 
   const fetchNotes = async () => {
-    const response = await fetch('http://localhost:8000/api/notes/');
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/`);
     const data = await response.json();
     setNotes(data);
   };
@@ -28,7 +28,7 @@ const NotePage = () => {
     fetchNotes();
 
     const fetchTags = async () => {
-      const response = await fetch('http://localhost:8000/api/tags/');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tags/`);
       if (response.ok) {
         const data = await response.json();
         setTags(data); // Store all tags in state
@@ -73,7 +73,7 @@ const NotePage = () => {
     };
   
     // Make a POST request to the server to create a new note
-    const response = await fetch('http://localhost:8000/api/notes/', {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -126,7 +126,6 @@ const NotePage = () => {
         <Col md={8}>
           <NoteContent 
             notes={notes}
-            setNotes={setNotes}
             activeNoteId={activeNoteId}
             showTagsDropdown={showTagsDropdown}
             setShowTagsDropdown={setShowTagsDropdown}
