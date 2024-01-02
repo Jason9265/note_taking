@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
-import { Container, Form, InputGroup, FormControl, Dropdown } from 'react-bootstrap';
+import { Container, Form, InputGroup, FormControl, Dropdown, Button, Modal } from 'react-bootstrap';
 
 
 const NoteContent = ({ notes, activeNoteId, showTagsDropdown, setShowTagsDropdown, selectedTags, setSelectedTags, tags }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 
   useEffect(() => {
@@ -95,6 +96,29 @@ const NoteContent = ({ notes, activeNoteId, showTagsDropdown, setShowTagsDropdow
 
     return newSelectedTags;
   };
+
+  const handleDeleteNote = () => {
+    setShowDeleteConfirm(true);
+  }
+
+  const confirmDelete = async () => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/${activeNoteId}/`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+  
+    if (response.ok) {
+      console.log('Note deleted');
+      window.location.reload();
+    } else {
+      console.error('Failed to delete the note');
+    }
+  
+    setShowDeleteConfirm(false);
+  };
+  
   
   if (!activeNoteId) {
     return <Container className='mt-4'><p>Select a note to view its content</p></Container>;
@@ -126,8 +150,24 @@ const NoteContent = ({ notes, activeNoteId, showTagsDropdown, setShowTagsDropdow
             ))}
           </Dropdown.Menu>
         </Dropdown>
+        <Button variant="outline-danger ms-1" onClick={handleDeleteNote}>Delete</Button>
       </InputGroup>
       
+      <Modal show={showDeleteConfirm} onHide={() => setShowDeleteConfirm(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Note</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to permanently delete this note?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <SimpleMDE
         value={content}
         onChange={handleContentChange}
