@@ -1,5 +1,5 @@
 # note_taking
 note taking app. Django + React + OpenAI api
 
-python manage.py runserver for start Django server
-npm start in frontend folder for start React development environment
+Use existing notes as a knowledge base to generate .md files.
+Provide customized instructions and it will give the answer from ChatGPT4.
