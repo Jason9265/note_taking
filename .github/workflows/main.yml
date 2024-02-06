@@ -1,7 +1,6 @@
 name: "Website Deployment"
 
 on:
-  push:
   workflow_dispatch:
 
 permissions:
@@ -68,28 +67,6 @@ jobs:
           service: ${{ needs.setup-vars.outputs.service }}
           name: ${{ needs.setup-vars.outputs.stack-name }}
 
-  deploy-prod:
-    name: Deploy to prod
-    # if: github.event_name != 'pull_request' && github.ref_name == 'main' && ${{ needs.changes.outputs.infra == 'true' }}
-    needs: [deploy-nonprod, setup-vars]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set AWS Credentials
-        uses: greenest-au/github-actions/aws-assume@main
-        with:
-          environment: gmprod
-          region: us-east-1
-          session-name: ${{ needs.setup-vars.outputs.project }}-${{ needs.setup-vars.outputs.service }}-prod
-      - name: Deploy
-        uses: greenest-au/github-actions/cf-deploy@main
-        with:
-          environment: prod
-          project: ${{ needs.setup-vars.outputs.project }}
-          service: ${{ needs.setup-vars.outputs.service }}
-          name: ${{ needs.setup-vars.outputs.stack-name }}
-
   sync-nonprod:
     name: Sync code to S3 in nonprod
     if: github.event_name != 'pull_request' && github.ref_name == 'main'
@@ -117,45 +94,3 @@ jobs:
           aws s3 cp s3://${{ needs.setup-vars.outputs.stack-name }}-nonprod/index.html s3://${{ needs.setup-vars.outputs.stack-name }}-nonprod/index.html \
             --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate \
             --content-type text/html
-          aws s3 cp s3://${{ needs.setup-vars.outputs.stack-name }}-nonprod/aboutus.html s3://${{ needs.setup-vars.outputs.stack-name }}-nonprod/aboutus.html \
-            --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate \
-            --content-type text/html
-          aws s3 cp s3://${{ needs.setup-vars.outputs.stack-name }}-nonprod/robots.txt.nonprod s3://${{ needs.setup-vars.outputs.stack-name }}-nonprod/robots.txt \
-            --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate \
-            --content-type text/plain
-
-  sync-prod:
-    name: Sync code to S3 in prod
-    if: github.event_name != 'pull_request' && github.ref_name == 'main'
-    needs: [setup-vars, sync-nonprod]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set AWS Credentials
-        uses: greenest-au/github-actions/aws-assume@main
-        with:
-          environment: gmprod
-          region: us-east-1
-          session-name: ${{ needs.setup-vars.outputs.project }}-${{ needs.setup-vars.outputs.service }}-prod
-      - name: Set up environment values
-        run: |
-          sed -i "s/GA_ANALYTICS/${{ secrets.GA_ANALYTICS_PROD }}/g" src/index.html && sed -i "s/GA_ANALYTICS/${{ secrets.GA_ANALYTICS_PROD }}/g" src/aboutus.html
-          sed -i "s/prelaunch-api.nonprod.growmate.au/prelaunch-api.growmate.au/g" src/assets/growmate.js
-      - name: Sync
-        uses: greenest-au/github-actions/s3-sync@main
-        with:
-          bucket: ${{ needs.setup-vars.outputs.stack-name }}-prod
-          folder: src/
-          environment: prod
-      - name: Cache busting
-        run: |
-          aws s3 cp s3://${{ needs.setup-vars.outputs.stack-name }}-prod/index.html s3://${{ needs.setup-vars.outputs.stack-name }}-prod/index.html \
-            --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate \
-            --content-type text/html
-          aws s3 cp s3://${{ needs.setup-vars.outputs.stack-name }}-prod/aboutus.html s3://${{ needs.setup-vars.outputs.stack-name }}-prod/aboutus.html \
-            --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate \
-            --content-type text/html
-          aws s3 cp s3://${{ needs.setup-vars.outputs.stack-name }}-prod/robots.txt.prod s3://${{ needs.setup-vars.outputs.stack-name }}-prod/robots.txt \
-            --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate \
-            --content-type text/plain
