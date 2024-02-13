@@ -6,7 +6,7 @@ import NoteList from './NoteList';
 import NoteContent from './NoteContent';
 import logo from '../img/logoreact.png';
 import './NotePage.css';
-import { Button, Container, Row, Col } from 'react-bootstrap';
+import { Button, Container, Row, Col, Alert } from 'react-bootstrap';
 
 const NotePage = () => {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ const NotePage = () => {
   const [showTagsDropdown, setShowTagsDropdown] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [tags, setTags] = useState([]);
+  const [showAlert, setShowAlert] = useState(false);
 
 
   const fetchNotes = async () => {
@@ -57,8 +58,27 @@ const NotePage = () => {
     // Implement import .md file functionality
   };
 
+  const downloadMDFile = (filename, content) => {
+    var blob = new Blob([content], { type: 'text/markdown;charset=utf-8'});
+
+    var downloadLink = document.createElement('a');
+    downloadLink.href = window.URL.createObjectURL(blob);
+    downloadLink.download = filename;
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+
   const handleExportMdButtonClick = () => {
     // Implement export .md file functionality
+    if (activeNoteId) {
+      const activeNote = notes.find(note => note.id === activeNoteId);
+      downloadMDFile(activeNote.title, activeNote.content);
+      setShowAlert(false);
+    } else {
+      setShowAlert(true);
+    }
   };
 
   const handleManageTagsClick = () => {
@@ -96,6 +116,11 @@ const NotePage = () => {
 
   return (
     <Container fluid>
+      {showAlert && (
+        <Alert variant='danger'>
+          Please select a note first
+        </Alert>
+      )}
       <Row className="align-items-center my-3">
         <Col xs={12} className="mb-3">
           <header className="d-flex align-items-center">
@@ -107,7 +132,7 @@ const NotePage = () => {
             <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleImportUrlButtonClick}>Import from URL</Button>
             <Button variant="outline-primary btn-lg ms-2" onClick={handleAddNote}>Create New Note</Button>
             <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleImportMdButtonClick}>Import .md file</Button>
-            <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleExportMdButtonClick}>Export .md file</Button>
+            <Button variant="outline-primary btn-lg ms-2" onClick={handleExportMdButtonClick}>Export .md file</Button>
             <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleManageTagsClick}>Manage tags</Button>
           </header>
         </Col>
