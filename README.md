@@ -7,13 +7,13 @@ https://jason.college/note
 Use existing notes as a knowledge base to generate .md files.
 Provide customized instructions and it will give the answer from ChatGPT4.
 
-# Setup envrionment variables before using OPENAI_API
+# Setup environment variables before using OPENAI_API
 
 Please setup your OPENAI_API_KEY into your environment, the format is
 
 ```export OPENAI_API_KEY='sk-XXX'```
 
-# Setup envrionment variables before using React
+# Setup environment variables before using React
 Please setup environment variables 'REACT_APP_API_URL'
 
 1. Create a file named '.env.developement' under ./frontend folder
