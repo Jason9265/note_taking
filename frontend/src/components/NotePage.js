@@ -6,7 +6,7 @@ import NoteList from './NoteList';
 import NoteContent from './NoteContent';
 import logo from '../img/logoreact.png';
 import './NotePage.css';
-import { Button, Container, Row, Col, Alert } from 'react-bootstrap';
+import { Alert, Button, Col, Container, Row, Modal } from 'react-bootstrap';
 
 const NotePage = () => {
   const navigate = useNavigate();
@@ -16,6 +16,8 @@ const NotePage = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [tags, setTags] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
+  const [showUploadMD, setShowUploadMD] = useState(false);
+  const [showTagsManage, setShowTagsManage] = useState(false);
 
 
   const fetchNotes = async () => {
@@ -55,8 +57,12 @@ const NotePage = () => {
   };
 
   const handleImportMdButtonClick = () => {
-    // Implement import .md file functionality
+    setShowUploadMD(true);
   };
+
+  const handleUploadMDClose = () => {
+    setShowUploadMD(false);
+  }
 
   const downloadMDFile = (filename, content) => {
     var blob = new Blob([content], { type: 'text/markdown;charset=utf-8'});
@@ -82,8 +88,12 @@ const NotePage = () => {
   };
 
   const handleManageTagsClick = () => {
-    // Implement export .md file functionality
+    setShowTagsManage(true);
   };
+
+  const handleTagsManageClose = () => {
+    setShowTagsManage(false);
+  }
 
   const handleAddNote = async () => {
     // Define the new note data
@@ -115,51 +125,83 @@ const NotePage = () => {
   };
 
   return (
-    <Container fluid>
-      {showAlert && (
-        <Alert variant='danger'>
-          Please select a note first
-        </Alert>
-      )}
-      <Row className="align-items-center my-3">
-        <Col xs={12} className="mb-3">
-          <header className="d-flex align-items-center">
-            <a href="/note">
-              <img src={logo} alt="Logo" height="80" />
-            </a>
+    <>
+      <Container fluid>
+        {showAlert && (
+          <Alert variant='danger'>
+            Please select a note first
+          </Alert>
+        )}
+        <Row className="align-items-center my-3">
+          <Col xs={12} className="mb-3">
+            <header className="d-flex align-items-center">
+              <a href="/note">
+                <img src={logo} alt="Logo" height="80" />
+              </a>
 
-            <Button variant="outline-primary btn-lg ms-2" onClick={handleChatButtonClick}>Chat with Note</Button>
-            <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleImportUrlButtonClick}>Import from URL</Button>
-            <Button variant="outline-primary btn-lg ms-2" onClick={handleAddNote}>Create New Note</Button>
-            <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleImportMdButtonClick}>Import .md file</Button>
-            <Button variant="outline-primary btn-lg ms-2" onClick={handleExportMdButtonClick}>Export .md file</Button>
-            <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleManageTagsClick}>Manage tags</Button>
-          </header>
-        </Col>
-      </Row>
+              <Button variant="outline-primary btn-lg ms-2" onClick={handleChatButtonClick}>Chat with Note</Button>
+              <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleImportUrlButtonClick}>Import from URL</Button>
+              <Button variant="outline-primary btn-lg ms-2" onClick={handleAddNote}>Create New Note</Button>
+              <Button variant="outline-primary btn-lg ms-2" onClick={handleImportMdButtonClick}>Import .md file</Button>
+              <Button variant="outline-primary btn-lg ms-2" onClick={handleExportMdButtonClick}>Export .md file</Button>
+              <Button variant="outline-primary btn-lg ms-2" onClick={handleManageTagsClick}>Manage tags</Button>
+            </header>
+          </Col>
+        </Row>
 
-      <Row>
-        {/* Left side: Note list */}
-        <Col md={4}>
-          <NoteList 
-            notes={notes}
-            onSelectNote={handleSelectNote}
-            activeNoteId={activeNoteId} />
-        </Col>
+        <Row>
+          {/* Left side: Note list */}
+          <Col md={4}>
+            <NoteList 
+              notes={notes}
+              onSelectNote={handleSelectNote}
+              activeNoteId={activeNoteId} />
+          </Col>
 
-        {/* Right side: Content of the selected note */}
-        <Col md={8}>
-          <NoteContent 
-            notes={notes}
-            activeNoteId={activeNoteId}
-            showTagsDropdown={showTagsDropdown}
-            setShowTagsDropdown={setShowTagsDropdown}
-            selectedTags={selectedTags}
-            setSelectedTags={setSelectedTags}
-            tags={tags} />
-        </Col>
-      </Row>
-    </Container>
+          {/* Right side: Content of the selected note */}
+          <Col md={8}>
+            <NoteContent 
+              notes={notes}
+              activeNoteId={activeNoteId}
+              showTagsDropdown={showTagsDropdown}
+              setShowTagsDropdown={setShowTagsDropdown}
+              selectedTags={selectedTags}
+              setSelectedTags={setSelectedTags}
+              tags={tags} />
+          </Col>
+        </Row>
+      </Container>
+
+      <Modal show={showUploadMD} onHide={handleUploadMDClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Upload File</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleUploadMDClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleUploadMDClose}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    
+      <Modal show={showTagsManage} onHide={handleTagsManageClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Tags Manage</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleTagsManageClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleTagsManageClose}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 };
 
