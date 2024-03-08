@@ -17,6 +17,7 @@ const NotePage = () => {
   const [tags, setTags] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
   const [showUploadMD, setShowUploadMD] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [showTagsManage, setShowTagsManage] = useState(false);
 
 
@@ -60,6 +61,39 @@ const NotePage = () => {
     setShowUploadMD(true);
   };
 
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  // get title and content of .md uploaded file
+  const handleUpload = () => {
+    if (selectedFile) {
+      if ( selectedFile.name.endsWith('.md') ) {
+        const newNoteTitle = getFileName(selectedFile.name);
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const fileContent = event.target.result;
+          console.log("content: ", fileContent);
+
+          handleAddNote(newNoteTitle, fileContent);
+        }
+        reader.readAsText(selectedFile);
+
+        handleUploadMDClose();
+      } else {
+        alert('Please select a markdown file to upload.');
+      }
+    } else {
+      alert('Please select a file to upload.');
+    }
+  };
+
+  const getFileName = (filename) => {
+    const extensionIndex = filename.lastIndexOf('.');
+    const nameOnly = extensionIndex !== -1 ? filename.slice(0, extensionIndex) : filename;
+    return nameOnly;
+  }
+
   const handleUploadMDClose = () => {
     setShowUploadMD(false);
   }
@@ -88,6 +122,7 @@ const NotePage = () => {
   };
 
   const handleManageTagsClick = () => {
+    // navigate to new page if tags too much
     setShowTagsManage(true);
   };
 
@@ -95,32 +130,35 @@ const NotePage = () => {
     setShowTagsManage(false);
   }
 
-  const handleAddNote = async () => {
+  const handleAddNote = async (newTitle = 'New Note', newContent = 'New Note Content') => {
     // Define the new note data
     const newNoteData = {
-      title: 'New Note',
-      content: 'New Note Content',
+      title: newTitle,
+      content: newContent,
     };
   
     // Make a POST request to the server to create a new note
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newNoteData)
-    });
-  
-    // Parse the response to get the created note
-    const createdNote = await response.json();
-  
-    // If the note is created successfully, update the notes state
-    if (response.ok) {
-      setNotes([...notes, createdNote]);
-      setActiveNoteId(createdNote.id); // Optionally set the new note as active
-    } else {
-      // Handle any errors, such as showing a message to the user
-      console.error('Failed to create a new note:', createdNote);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newNoteData)
+      });
+    
+      // If the note is created successfully, update the notes state
+      if (response.ok) {
+        // Parse the response to get the created note
+        const createdNote = await response.json();
+        setNotes([...notes, createdNote]);
+        setActiveNoteId(createdNote.id); // Optionally set the new note as active
+      } else {
+        // Handle any errors, such as showing a message to the user
+        console.error('Failed to create a new note:');
+      }
+    } catch (error) {
+      console.error('Error creating new note:', error);
     }
   };
 
@@ -141,7 +179,7 @@ const NotePage = () => {
 
               <Button variant="outline-primary btn-lg ms-2" onClick={handleChatButtonClick}>Chat with Note</Button>
               <Button disabled variant="outline-primary btn-lg ms-2" onClick={handleImportUrlButtonClick}>Import from URL</Button>
-              <Button variant="outline-primary btn-lg ms-2" onClick={handleAddNote}>Create New Note</Button>
+              <Button variant="outline-primary btn-lg ms-2" onClick={() => handleAddNote()}>Create New Note</Button>
               <Button variant="outline-primary btn-lg ms-2" onClick={handleImportMdButtonClick}>Import .md file</Button>
               <Button variant="outline-primary btn-lg ms-2" onClick={handleExportMdButtonClick}>Export .md file</Button>
               <Button variant="outline-primary btn-lg ms-2" onClick={handleManageTagsClick}>Manage tags</Button>
@@ -176,13 +214,15 @@ const NotePage = () => {
         <Modal.Header closeButton>
           <Modal.Title>Upload File</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
+        <Modal.Body>
+          <input type="file" onChange={handleFileChange} />
+        </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleUploadMDClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleUploadMDClose}>
-            Save Changes
+          <Button variant="primary" onClick={handleUpload}>
+            Upload File
           </Button>
         </Modal.Footer>
       </Modal>
