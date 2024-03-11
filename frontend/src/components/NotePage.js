@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NoteList from './NoteList';
 import NoteContent from './NoteContent';
+import TagsManageModal from './TagsManageModal';
 import logo from '../img/logoreact.png';
 import './NotePage.css';
-import { Alert, Button, Col, Container, Row, Modal } from 'react-bootstrap';
+import { Alert, Button, Col, Container, Modal, Row } from 'react-bootstrap';
 
 const NotePage = () => {
   const navigate = useNavigate();
@@ -21,27 +22,25 @@ const NotePage = () => {
   const [showTagsManage, setShowTagsManage] = useState(false);
 
 
+  useEffect(() => {
+    fetchNotes();
+    fetchTags();
+  }, []);
+
   const fetchNotes = async () => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/`);
     const data = await response.json();
     setNotes(data);
   };
 
-  // Fetch list of notes
-  useEffect(() => {
-    fetchNotes();
+  const fetchTags = async () => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tags/`);
+    if (response.ok) {
+      const data = await response.json();
+      setTags(data); // Store all tags in state
+    }
+  };
 
-    const fetchTags = async () => {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tags/`);
-      if (response.ok) {
-        const data = await response.json();
-        setTags(data); // Store all tags in state
-      }
-    };
-
-    fetchTags();
-  }, []);
- 
   const handleSelectNote = (note) => {
     fetchNotes();
     setActiveNoteId(note.id);
@@ -162,6 +161,7 @@ const NotePage = () => {
     }
   };
 
+
   return (
     <>
       <Container fluid>
@@ -226,21 +226,8 @@ const NotePage = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    
-      <Modal show={showTagsManage} onHide={handleTagsManageClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Tags Manage</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleTagsManageClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleTagsManageClose}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+
+      <TagsManageModal show={showTagsManage} onHide={handleTagsManageClose}></TagsManageModal>
     </>
   );
 };
