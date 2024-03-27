@@ -1,11 +1,25 @@
 # note_taking
 note taking app. Django + React + OpenAI API
 
-# Demo site
+# Demo Site
 https://jason.college/note
 
 Use existing notes as a knowledge base to generate .md files.
 Provide customized instructions and it will give the answer from ChatGPT4.
+
+# Setup Django packages
+
+run following commands
+
+```pip install Django django-cors-headers django-webpack-loader djangorestframework openai```
+
+migrate data model
+
+```python manage.py migrate```
+
+start server
+
+```python manage.py runserver```
 
 # Setup environment variables before using OPENAI_API
 
@@ -17,12 +31,9 @@ Please setup your OPENAI_API_KEY into your environment, the format is
 Please setup environment variables 'REACT_APP_API_URL'
 
 1. Create a file named '.env.developement' under ./frontend folder
+```echo "REACT_APP_API_URL=http://localhost:8000" > .env.development```
 
-2. Copy this line into the file
-
-    ```REACT_APP_API_URL = http://localhost:8000```
-
-3. Run ```npm run start``` again to apply environment variables
+2. Run ```npm run start``` again to apply environment variables
 
 For deploying it on production, please 
 
