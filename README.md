@@ -1,5 +1,5 @@
 # note_taking
-note taking app. Django + React + OpenAI API
+note taking app. Django + React + OpenAI API + MongoDB
 
 # Demo Site
 https://jason.college/note
@@ -11,7 +11,7 @@ Provide customized instructions and it will give the answer from ChatGPT4.
 
 run following commands
 
-```pip install Django django-cors-headers django-webpack-loader djangorestframework openai```
+```pip install Django django-cors-headers django-webpack-loader djangorestframework pymongo==3.12.3 openai```
 
 migrate data model
 
@@ -20,6 +20,8 @@ migrate data model
 start server
 
 ```python manage.py runserver```
+
+# Start MongoDB Community Server
 
 # Setup environment variables before using OPENAI_API
 
