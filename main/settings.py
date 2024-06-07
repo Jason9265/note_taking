@@ -63,7 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'note.urls'
+ROOT_URLCONF = 'main.urls'
 
 TEMPLATES = [
     {
@@ -81,16 +81,26 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'note.wsgi.application'
+WSGI_APPLICATION = 'main.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'test-db1',
+        # 'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': 'mongodb://localhost:27017',
+        }
     }
 }
 
